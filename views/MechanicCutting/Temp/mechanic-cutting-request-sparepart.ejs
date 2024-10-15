@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" class="sidebar_minimize">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Cutting Mechanic</title>
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <link rel="icon" href="./assets/img/icon.ico" type="image/x-icon" />
+    <script src="./assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+            google: { "families": ["Open+Sans:300,400,600,700"] },
+            custom: { "families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands"], urls: ['./assets/css/fonts.css'] },
+            active: function () {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/css/azzara.min.css">
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="./assets/css/demo.css">
+</head>
+<body style="background-color: white;">
+    <div class="wrapper">
+        <div class="main-header" data-background-color="purple">
+            <!-- Logo Header -->
+            <div class="logo-header">
+
+                <a href="/" class="logo">
+                    <h2 class="navbar-brand" style="color: white;">Cutting Mechanic</h2>
+                </a>
+                <button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse"
+                    data-target="collapse" aria-expanded="true" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon">
+                        <i class="fa fa-bars"></i>
+                    </span>
+                </button>
+                <button class="topbar-toggler more"><i class="fa fa-ellipsis-v"></i></button>
+                <div class="navbar-minimize">
+                    <button class="btn btn-minimize btn-rounded">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <nav class="navbar navbar-header navbar-expand-lg">
+                <span class="navbar-brand text-white">
+                    <img src="./assets/img/icons8-innovate-64.png" width="30" height="30" alt="">
+                    Yêu cầu danh sách phụ tùng & Xuất kho
+                </span>
+
+                <div class="container-fluid">
+                    <div class="col d-flex float-right">
+                        <button class="btn btn-success ml-auto" id="btn_request_each_sys">Yêu cầu ngoài hệ
+                            thống</button>
+                    </div>
+                    <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
+                        <li class="nav-item dropdown hidden-caret">
+                            <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#"
+                                aria-expanded="false">
+                                <div class="avatar-sm">
+                                    <img src="./assets/img/inno.jpg" alt="..." class="avatar-img rounded-circle">
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user animated fadeIn">
+                                <li>
+                                    <div class="user-box">
+                                        <div class="avatar-lg"><img src="./assets/img/inno.jpg" alt="image profile"
+                                                class="avatar-img rounded"></div>
+                                        <div class="u-text">
+                                            <% if (typeof user!=='undefined' ) { %>
+                                                <h4 id="username">Xin chào <%= user%>
+                                                </h4>
+                                                <% } else { %>
+                                                    <h4 id="username">mung.tran@hanes.com</h4>
+                                                    <% } %>
+                                                        <p class="text-muted text-success">Leading the challange</p><a
+                                                            href="/logout"
+                                                            class="btn btn-rounded btn-danger btn-sm">Thoát</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
+            </nav>
+            <!-- End Navbar -->
+        </div>
+        <!-- Sidebar -->
+        <%- include ("./partials/mechanic-cutting-sidebar.ejs"); -%>
+            <!-- End Sidebar -->
+            <div class="main-panel bg">
+                <div class="content bg">
+                    <div class="row row-demo-grid">
+                        <div class="card col-md-12" style="background-color: white;">
+                            <div class="card-header">
+                                <div class="card-title">Tổng hợp các yêu cầu phụ tùng</div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="table_summary_part_request">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">#</th>
+                                                <th class="text-center">ID Yêu cầu</th>
+                                                <th class="text-center">Người yêu cầu</th>
+                                                <th class="text-center">Máy yêu cầu</th>
+                                                <th class="text-center">Lỗi chi tiết</th>
+                                                <th class="text-center">Số item</th>
+                                                <th class="text-center">Trạng thái</th>
+                                                <th class="text-center">Thời gian yêu cầu</th>
+                                                <th class="text-center">Nhận hàng</th>
+                                                <th class="text-center">Hủy yêu cầu</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal open ticket -->
+            <div class="modal" id="modal_setup_layout" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document" style="width: fit-content;">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h2 class="modal-title">Chuyển vị trí máy - <span id="txt_machine_name"></span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: red;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="col-md-4 form-group form-inline">
+                                    <i class="la fab fa-periscope text-info"
+                                        style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 16px;">Vị trí hiện tại</span>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label for="txt_cur_row">Hàng</label>
+                                    <input type="txt" class="form-control" id="txt_cur_row">
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label for="txt_cur_col">Cột</label>
+                                    <input type="txt" class="form-control" id="txt_cur_col">
+                                </div>
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="col-md-4 form-group form-inline">
+                                    <i class="la fas fa-map-marked-alt text-danger"
+                                        style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 16px;">Vị trí mới</span>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="txt_new_row" class="text-info" style="font-size: 14px;">Chọn
+                                        Hàng</label>
+                                    <select class="form-control input-square p-0" id="txt_new_row">
+
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="txt_new_col" class="text-info" style="font-size: 14px;">Chọn cột</label>
+                                    <select class="form-control input-square p-0" id="txt_new_col">
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="btn_submit">Xác nhận</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal repair-->
+            <div class="modal" id="modal_machine_list" tabindex="-1" role="dialog">
+                <style>
+                    .modal-lg {
+                        max-width: 80%;
+                    }
+                </style>
+                <div class="modal-dialog modal-lg " role="document" style="width: fit-content;">
+                    <div class="modal-content">
+                        <div class="modal-header bg-secondary">
+                            <h2 class="modal-title">Danh sách và thông tin máy nhà máy cắt</span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: red;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-3">
+                            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                <table class="table table-bordered table-hover" id="table_machine">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="text-center">#</th>
+                                            <th scope="col" class="text-center">ID máy</th>
+                                            <th scope="col" class="text-center">Kiểu máy</th>
+                                            <th scope="col" class="text-center">Tên máy</th>
+                                            <th scope="col" class="text-center">Số Serial</th>
+                                            <th scope="col" class="text-center">Vị trí</th>
+                                            <th scope="col" class="text-center">Hàng</th>
+                                            <th scope="col" class="text-center">Cột</th>
+                                            <th scope="col" class="text-center">TrạngThái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <!--   Core JS Files   -->
+    <script src="./assets/js/core/jquery.3.2.1.min.js"></script>
+    <script src="./assets/js/core/popper.min.js"></script>
+    <script src="./assets/js/core/bootstrap.min.js"></script>
+    <!-- jQuery UI -->
+    <script src="./assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+    <script src="./assets/js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"></script>
+    <!-- jQuery Scrollbar -->
+    <script src="./assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+    <!-- Moment JS -->
+    <script src="./assets/js/plugin/moment/moment.min.js"></script>
+    <!-- Chart JS -->
+    <script src="./assets/js/plugin/chart.js/chart.min.js"></script>
+    <!-- jQuery Sparkline -->
+    <script src="./assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+    <!-- Chart Circle -->
+    <script src="./assets/js/plugin/chart-circle/circles.min.js"></script>
+    <!-- Datatables -->
+    <script src="./assets/js/plugin/datatables/datatables.min.js"></script>
+    <!-- Bootstrap Notify -->
+    <script src="./assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <!-- Bootstrap Toggle -->
+    <script src="./assets/js/plugin/bootstrap-toggle/bootstrap-toggle.min.js"></script>
+    <!-- jQuery Vector Maps -->
+    <script src="./assets/js/plugin/jqvmap/jquery.vmap.min.js"></script>
+    <script src="./assets/js/plugin/jqvmap/maps/jquery.vmap.world.js"></script>
+    <!-- Google Maps Plugin -->
+    <script src="./assets/js/plugin/gmaps/gmaps.js"></script>
+    <!-- Sweet Alert -->
+    <script src="./assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+    <!-- Azzara JS -->
+    <script src="./assets/js/ready.min.js"></script>
+    <!-- Azzara DEMO methods, don't include it in your project! -->
+    <script src="./assets/js/setting-demo.js"></script>
+    <script src="./JS/MechanicCutting/js-mechanic-cutting-request-sparepart.js"></script>
+    <!-- TranMung -->
+</body>
+
+</html>

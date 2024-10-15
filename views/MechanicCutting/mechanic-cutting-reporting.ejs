@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" class="sidebar_minimize">
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Cutting Mechanic</title>
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <link rel="icon" href="./assets/img/icon.ico" type="image/x-icon" />
+    <script src="./assets/js/plugin/webfont/webfont.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script>
+        WebFont.load({
+            google: { "families": ["Open+Sans:300,400,600,700"] },
+            custom: { "families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands"], urls: ['./assets/css/fonts.css'] },
+            active: function () {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/css/azzara.min.css">
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="./assets/css/demo.css">
+</head>
+<body style="background-color: white;">
+    <div class="wrapper">
+        <div class="main-header" data-background-color="purple">
+            <!-- Logo Header -->
+            <div class="logo-header">
+
+                <a href="/" class="logo">
+                    <h2 class="navbar-brand" style="color: white;">Cutting Mechanic</h2>
+                </a>
+                <button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse"
+                    data-target="collapse" aria-expanded="true" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon">
+                        <i class="fa fa-bars"></i>
+                    </span>
+                </button>
+                <button class="topbar-toggler more"><i class="fa fa-ellipsis-v"></i></button>
+                <div class="navbar-minimize">
+                    <button class="btn btn-minimize btn-rounded">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <nav class="navbar navbar-header navbar-expand-lg">
+                <span class="navbar-brand text-white">
+                    <img src="./assets/img/icons8-innovate-64.png" width="30" height="30" alt="">
+                    Thông tin báo cáo tổng hợp hệ thống quản lý máy
+                </span>
+
+                <div class="container-fluid div-selection">
+                    <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
+                        <li>
+                            <button class="btn btn-success ml-auto" id="btn_add_cuttingcode"
+                                style="margin-right: 10px;">Thêm lỗi máy</button>
+                        </li>
+                        <li class="nav-item dropdown hidden-caret">
+                            <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#"
+                                aria-expanded="false">
+                                <div class="avatar-sm">
+                                    <img src="./assets/img/inno.jpg" alt="..." class="avatar-img rounded-circle">
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user animated fadeIn">
+                                <li>
+                                    <div class="user-box">
+                                        <div class="avatar-lg"><img src="./assets/img/inno.jpg" alt="image profile"
+                                                class="avatar-img rounded"></div>
+                                        <div class="u-text">
+                                            <% if (typeof user!=='undefined' ) { %>
+                                                <h4 id="username">Xin chào <%= user%>
+                                                </h4>
+                                                <% } else { %>
+                                                    <h4 id="username">mung.tran@hanes.com</h4>
+                                                    <% } %>
+                                                        <p class="text-muted text-success">Leading the challange</p><a
+                                                            href="/logout"
+                                                            class="btn btn-rounded btn-danger btn-sm">Thoát</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
+            </nav>
+            <!-- End Navbar -->
+        </div>
+        <!-- Sidebar -->
+        <%- include ("./partials/mechanic-cutting-sidebar.ejs"); -%>
+            <!-- End Sidebar -->
+			<div class="main-panel">
+				<div class="content">
+					<div class="row" style="margin: 10px;">
+                        <div class="col-md-12">
+							<div class="card">
+								<!-- <div class="card-header">
+									<h4 class="card-title">Nav Pills (Horizontal Tabs)</h4>
+								</div> -->
+								<div class="card-body">
+									<ul class="nav nav-pills nav-secondary" id="pills-tab" role="tablist" style="align-items: center;justify-content: center;">
+										<li class="nav-item">
+											<a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true"><i class="fas fas fa-magic"
+                                                style="margin-right: 2px;"></i>Báo cáo theo thời gian thực</a>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false"><i class="fas fa-chart-bar"
+                                                style="margin-right: 2px;"></i>Báo cáo tổng hợp theo dõi</a>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false"><i class="fas fa-cog"
+                                                style="margin-right: 2px;"></i>Thông tin hướng dẫn</a>
+										</li>
+									</ul>
+									<div class="tab-content mt-2 mb-3" id="pills-tabContent">
+										<div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                                            <div class="container mx-auto" style="margin-bottom: 10px;">
+                                                <div class="form-row align-items-center justify-content-center text-center" style="margin-bottom: 0;">
+                                                    <div class="col-sm-3 my-1">
+                                                        <label for="date_from" class="text-primary" style="text-align: left;">Từ ngày</label>
+                                                        <input type="date" class="form-control" id="date_from" >
+                                                    </div>
+                                                    <div class="col-sm-3 my-1">
+                                                        <label for="date_to" class="text-primary">Đến ngày</label>
+                                                        <input type="date" class="form-control" id="date_to">
+                                                    </div>
+                                                    <div class="col-auto my-1">
+                                                        <button class="btn btn-danger btn-lg" id="btn_refresh_downtime_data">Cập Nhật</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        
+                                            <div class="p-0" style="overflow-x: auto;">
+                                                <table class="table table-bordered" id="table_machinedowntime">
+													<thead class="bg-info">
+														<tr>
+															<th scope="col" class="text-center text-white">#</th>
+															<th scope="col" class="text-center text-white">Ngày</th>
+															<th scope="col" class="text-center text-white">Mã máy</th>
+															<th scope="col" class="text-center text-white">Tên máy</th>
+                                                            <th scope="col" class="text-center text-white">Trạng thái</th>
+                                                            <th scope="col" class="text-center text-white">Tên lỗi</th>
+															<th scope="col" class="text-center text-white">Downtime<br>Phút</th>
+                                                            <th scope="col" class="text-center text-white">Thời gian<br>yêu cầu</th>
+															<th scope="col" class="text-center text-white">Nhân viên mở</th>
+                                                            <th scope="col" class="text-center text-white">Thời gian<br>bắt đầu</th>
+                                                            <th scope="col" class="text-center text-white">Thợ máy<br>nhận sửa</th>
+															<th scope="col" class="text-center text-white">Thời gian<br>hoàn thành</th>
+                                                            <th scope="col" class="text-center text-white">Thợ máy<br>xác nhận</th>
+															<th scope="col" class="text-center text-white">Thời gian sx<br>xác nhận</th>
+															<th scope="col" class="text-center text-white">Nhân viên<br>xác nhận</th>
+															<th scope="col" class="text-center text-white">Ghi chú</th>
+														</tr>
+													</thead>
+													<tbody id="tbody_table_machinedowntime">
+													</tbody>
+												</table>
+											</div>
+										</div>
+										<div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                                            <div class="col-md-12">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <div class="card-title">Tổng hợp theo mã lỗi</div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="chart-container">
+                                                            <canvas id="barChartbycodedowntime"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <div class="card-title">Tổng hợp theo chủng loại máy</div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="chart-container">
+                                                            <canvas id="barChartbytypeofmachine"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+										</div>
+										<div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                                            <div class="table-responsive mx-auto" style="max-width: fit-content;">
+												<table class="table table-bordered" id="table_errocodemachine">
+													<thead class="bg-success">
+														<tr>
+															<th scope="col" class="text-center text-white">#</th>
+															<th scope="col" class="text-center text-white">Mã hỏng</th>
+															<th scope="col" class="text-center text-white">Thông tin</th>
+															<th scope="col" class="text-center text-white">Trạng thái</th>
+															<th scope="col" class="text-center text-white">Tài khoản<br>Cập nhật</th>
+                                                            <th scope="col" class="text-center text-white">Thời gian<br>cập nhật</th>
+														</tr>
+													</thead>
+													<tbody id="tbody_table_errocodemachine">
+													</tbody>
+												</table>
+                                                <div id="ev_button" style="display: block;">
+                                                    <button class="btn btn-success float-right" id="btn_save_balancing">
+                                                        <span class="btn-label"><i class="fa fa-check"></i>
+                                                        </span> Chỉ mã code duy nhất</button>
+                                                    <button class="btn btn-danger float-left" id="btn_delete_balancing"
+                                                        style="margin-left: 30px;">
+                                                        <span class="btn-label"><i class="fa flaticon-interface-5"></i></span>Thợ máy cập nhật</button>
+                                                </div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+                        
+					</div>
+				</div>
+			</div>
+            <div class="modal" id="modal_adding_cuttingmachine_code" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document" style="width: fit-content;">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h2 class="modal-title">THÊM CODE MÁY HỎNG</span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: red;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group col-md-12">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text text-danger">
+                                        <i class="fas fa-chess-pawn">     ER-</i>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Nhập mã lỗi mới" id="txt_defect_code">
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group col-md-12" >
+                                    <label for="txt_defect_content" class="text-info">Mô tả và thông tin lỗi</label>
+                                    <textarea class="form-control" id="txt_defect_content" rows="3"></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="btn_upload_code">Xác nhận</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <!--   Core JS Files   -->
+    <script src="./assets/js/core/jquery.3.2.1.min.js"></script>
+    <script src="./assets/js/core/popper.min.js"></script>
+    <script src="./assets/js/core/bootstrap.min.js"></script>
+    <!-- jQuery UI -->
+    <script src="./assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+    <script src="./assets/js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"></script>
+    <!-- jQuery Scrollbar -->
+    <script src="./assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+    <!-- Moment JS -->
+    <script src="./assets/js/plugin/moment/moment.min.js"></script>
+    <!-- Chart JS -->
+    <script src="./assets/js/plugin/chart.js/chart.min.js"></script>
+    <!-- jQuery Sparkline -->
+    <script src="./assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+    <!-- Chart Circle -->
+    <script src="./assets/js/plugin/chart-circle/circles.min.js"></script>
+    <!-- Datatables -->
+    <script src="./assets/js/plugin/datatables/datatables.min.js"></script>
+    <!-- Bootstrap Notify -->
+    <script src="./assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <!-- Bootstrap Toggle -->
+    <script src="./assets/js/plugin/bootstrap-toggle/bootstrap-toggle.min.js"></script>
+    <!-- jQuery Vector Maps -->
+    <script src="./assets/js/plugin/jqvmap/jquery.vmap.min.js"></script>
+    <script src="./assets/js/plugin/jqvmap/maps/jquery.vmap.world.js"></script>
+    <!-- Google Maps Plugin -->
+    <script src="./assets/js/plugin/gmaps/gmaps.js"></script>
+    <!-- Sweet Alert -->
+    <script src="./assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+    <!-- Azzara JS -->
+    <script src="./assets/js/ready.min.js"></script>
+    <!-- Azzara DEMO methods, don't include it in your project! -->
+    <script src="./assets/js/setting-demo.js"></script>
+    <script src="./JS/MechanicCutting/js-mechanic-cutting-downtime-reporting.js"></script>
+    <!-- TranMung -->
+
+</body>
+
+</html>

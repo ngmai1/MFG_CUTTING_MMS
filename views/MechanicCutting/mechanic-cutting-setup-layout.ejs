@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en" class="sidebar_minimize">
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Cutting Mechanic</title>
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' charset="UTF-8" name='viewport' />
+    <link rel="icon" href="./assets/img/icon.ico" type="image/x-icon" />
+    <script src="./assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+            google: { "families": ["Open+Sans:300,400,600,700"] },
+            custom: { "families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands"], urls: ['./assets/css/fonts.css'] },
+            active: function () {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/css/azzara.min.css">
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="./assets/css/demo.css">
+    <style>
+        .machine-container {
+            display: grid;
+            grid-template-columns: repeat(26, 1fr);
+            grid-template-rows: repeat(9, minmax(70px, 1fr));
+            /* Điều chỉnh chiều cao của mỗi dòng */
+            grid-gap: 3px;
+            border: 1px white;
+            width: 100%;
+            height: 100%;
+            /* Thêm chiều cao 100% */
+            padding-top: 25px;
+            padding-left: 25px;
+            padding-right: 25px;
+            padding-bottom: 25px;
+        }
+
+        .machine {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 12px;
+            position: relative;
+            border: 1px white;
+            grid-column: span 1;
+            text-align: center;
+            border-radius: 5px;
+            height: minmax(70px, 1fr);
+            /* Điều chỉnh chiều cao của máy */
+        }
+
+        .empty-cell {
+            background-color: rgb(243, 243, 243);
+            border: 1px dashed rgba(0, 0, 0, 0.5);
+            opacity: 0.4;
+            grid-column: span 1;
+            height: minmax(70px, 1fr);
+            /* Điều chỉnh chiều cao của máy */
+        }
+
+        .column-number {
+            position: absolute;
+            top: 0px;
+            left: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: calc(100% - 25px - 25px);
+            height: 25px;
+            font-weight: bold;
+        }
+
+        .column-number div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+
+
+        .row-number {
+            position: absolute;
+            top: 5px;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 25px;
+            height: 100%;
+            font-weight: bold;
+            height: minmax(70px, 1fr);
+            /* Điều chỉnh chiều cao của máy */
+        }
+
+        .row-number div {
+            height: calc(100% / 9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .column-background {
+            position: relative;
+            background-color: white;
+            border: 1px solid black;
+        }
+
+        .machine[state="0"] {
+            background-color: green;
+            /* Màu xanh */
+        }
+
+        .machine[state="2"] {
+            background-color: yellow;
+            /* Màu vàng */
+        }
+
+        .machine[state="1"] {
+            background-color: red;
+            /* Màu đỏ */
+        }
+
+        .machine[state="3"] {
+            background-color: blue;
+            /* Màu xanh dương */
+        }
+    </style>
+</head>
+
+<body style="background-color: white;">
+    <div class="wrapper">
+        <div class="main-header" data-background-color="purple">
+            <!-- Logo Header -->
+            <div class="logo-header">
+
+                <a href="/" class="logo">
+                    <h2 class="navbar-brand" style="color: white;">Cutting Mechanic</h2>
+                </a>
+                <button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse"
+                    data-target="collapse" aria-expanded="true" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon">
+                        <i class="fa fa-bars"></i>
+                    </span>
+                </button>
+                <button class="topbar-toggler more"><i class="fa fa-ellipsis-v"></i></button>
+                <div class="navbar-minimize">
+                    <button class="btn btn-minimize btn-rounded">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <nav class="navbar navbar-header navbar-expand-lg">
+                <span class="navbar-brand text-white">
+                    <img src="./assets/img/icons8-innovate-64.png" width="30" height="30" alt="">
+                    Inventory Máy & Thiết lập vị trí
+                </span>
+
+                <div class="container-fluid">
+
+                    <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
+
+                        <li>
+                            <form id="upload_form" method='POST' action='cutting-machine-update-machine'
+                                submit='return false;'>
+                                <input type='file' name='file' id='file' style='display: none;'>
+                                <input type='submit' id='submit' style='display: none;'>
+                                <button class="btn btn-success ml-auto" id="btn_upload" style="margin-right: 10px;">Thêm
+                                    mới</button>
+                            </form>
+                        </li>
+
+                        <li>
+                            <button class="btn btn-danger ml-auto" id="btn_adjust_machine"
+                                style="margin-right: 10px;">Điều chỉnh</button>
+                        </li>
+                        <li>
+                            <a class="btn btn-default ml-auto" id="btn_template" style="margin-right: 10px;"
+                                href="../TemplateExcel/CuttingMechanicMachineUploadTemplate.xlsx"
+                                download="cutting_mechanic_upload_machine_template.xlsx">Template</a>
+                        </li>
+                        <li class="nav-item dropdown hidden-caret">
+                            <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#"
+                                aria-expanded="false">
+                                <div class="avatar-sm">
+                                    <img src="./assets/img/inno.jpg" alt="..." class="avatar-img rounded-circle">
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user animated fadeIn">
+                                <li>
+                                    <div class="user-box">
+                                        <div class="avatar-lg"><img src="./assets/img/inno.jpg" alt="image profile"
+                                                class="avatar-img rounded"></div>
+                                        <div class="u-text">
+                                            <% if (typeof user!=='undefined' ) { %>
+                                                <h4 id="username">Xin chào <%= user%>
+                                                </h4>
+                                                <% } else { %>
+                                                    <h4 id="username">mung.tran@hanes.com</h4>
+                                                    <% } %>
+                                                        <p class="text-muted text-success">Leading the challange</p><a
+                                                            href="/logout"
+                                                            class="btn btn-rounded btn-danger btn-sm">Thoát</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
+            </nav>
+            <!-- End Navbar -->
+        </div>
+        <!-- Sidebar -->
+        <%- include ("./partials/mechanic-cutting-sidebar.ejs"); -%>
+            <!-- End Sidebar -->
+            <style>
+                .bg {
+                    background-color: white;
+                }
+
+                .loader_custom {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+            </style>
+            <div class="main-panel bg">
+                <div class="content bg">
+                    <div class="row row-demo-grid" style="background-color: white;align-items: center;">
+                        <div class="card mx-auto w-100">
+                            <div class="card-body p-0">
+                                <ul class="nav nav-pills nav-secondary" id="pills-tab" role="tablist"
+                                    style="align-items: center;justify-content: center;">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="pills-home-tab" data-toggle="pill"
+                                            href="#pills-home" role="tab" aria-controls="pills-home"
+                                            aria-selected="true"><i class="fas fa-rss-square"
+                                                style="margin-right: 2px;"></i>Thiết lập điều chuyển vị trí</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="pills-profile-tab" data-toggle="pill"
+                                            href="#pills-profile" role="tab" aria-controls="pills-profile"
+                                            aria-selected="false"><i class="fas fa-align-justify"
+                                                style="margin-right: 2px;"></i>Thông tin Inventory máy</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content mt-2 mb-3" id="pills-tabContent">
+                                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
+                                        aria-labelledby="pills-home-tab">
+                                        <div class="col-md-12" style="background-color: white;">
+                                            <div class="card">
+                                                <div class="card-body p-0">
+                                                    <div class="container-fluid" style="padding:0px">
+                                                        <div class="machine-container" id="machineContainer"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="pills-profile" role="tabpanel"
+                                        aria-labelledby="pills-profile-tab">
+                                        <div class="row p-0" style="background-color: white;">
+                                            <div class="col-md-4">
+                                                <div class="card card-stats card-round" >
+                                                    <div class="card-body " style="background-color: white;">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-icon">
+                                                                <div class="icon-big text-center icon-success bubble-shadow-small">
+                                                                    <i class="fas fa-braille"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col col-stats ml-3 ml-sm-0">
+                                                                <div class="numbers">
+                                                                    <p class="card-category">Số máy tại xưởng</p>
+                                                                    <h2 class="card-title" id="total_machine_floor">0</h>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <table class="table table-bordered" style="margin-top: 3px;" id="table_machine_floor">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">#</th>
+                                                                    <th scope="col">Mã máy</th>
+                                                                    <th scope="col">Loại máy</th>
+                                                                    <th scope="col">Tên máy</th>
+                                                                    <th scope="col">Số Serial</th>
+                                                                    <th scope="col">Chi tiết</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="card card-stats card-round">
+                                                    <div class="card-body" style="background-color: white;">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-icon">
+                                                                <div class="icon-big text-center icon-info bubble-shadow-small">
+                                                                    <i class="fas fa-door-open"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col col-stats ml-3 ml-sm-0">
+                                                                <div class="numbers">
+                                                                    <p class="card-category">Số máy ở kho</p>
+                                                                    <h2 class="card-title" id="total_machine_stock">0</h2>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <table class="table table-bordered" style="margin-top: 3px;"  id="table_machine_stock">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">#</th>
+                                                                    <th scope="col">Mã máy</th>
+                                                                    <th scope="col">Loại máy</th>
+                                                                    <th scope="col">Tên máy</th>
+                                                                    <th scope="col">Số Serial</th>
+                                                                    <th scope="col">Chi tiết</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="card card-stats card-round">
+                                                    <div class="card-body" style="background-color: white;">
+                                                        <div class="row align-items-center">
+                                                            <div class="col-icon">
+                                                                <div class="icon-big text-center icon-secondary bubble-shadow-small">
+                                                                    <i class="fas fa-flag"></i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col col-stats ml-3 ml-sm-0">
+                                                                <div class="numbers">
+                                                                    <p class="card-category">Khu vực khác</p>
+                                                                    <h4 class="card-title" id="total_machine_other">0</h4>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <table class="table table-bordered" style="margin-top: 3px;"  id="table_machine_other">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">#</th>
+                                                                    <th scope="col">Mã máy</th>
+                                                                    <th scope="col">Loại máy</th>
+                                                                    <th scope="col">Tên máy</th>
+                                                                    <th scope="col">Số Serial</th>
+                                                                    <th scope="col">Chi tiết</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <style>
+                                        .cusstom-show {
+                                            position: fixed;
+                                            bottom: 0;
+                                            right: 0;
+                                            margin: 20px; /* Optional: Add margin for better spacing */
+                                            }
+                                          </style>
+                                        <div class="cusstom-show">
+                                            <button class="btn btn-danger" id="btn_full_inventory">Toàn bộ <br>thông tin</button> 
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="loader loader-danger loader_custom" id="txt_loader"></div>
+            </div>
+            <!-- Modal open ticket -->
+            <div class="modal" id="modal_setup_layout" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document" style="width: fit-content;">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h2 class="modal-title">Chuyển vị trí máy - <span id="txt_machine_name"></span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: red;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="col-md-4 form-group form-inline">
+                                    <i class="la fab fa-periscope text-info"
+                                        style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 16px;">Vị trí hiện tại</span>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label for="txt_cur_row">Hàng</label>
+                                    <input type="txt" class="form-control" id="txt_cur_row">
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label for="txt_cur_col">Cột</label>
+                                    <input type="txt" class="form-control" id="txt_cur_col">
+                                </div>
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="col-md-4 form-group form-inline">
+                                    <i class="la fas fa-map-marked-alt text-danger"
+                                        style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 16px;">Vị trí mới</span>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="txt_new_row" class="text-info" style="font-size: 14px;">Chọn
+                                        Hàng</label>
+                                    <select class="form-control input-square p-0" id="txt_new_row">
+
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="txt_new_col" class="text-info" style="font-size: 14px;">Chọn cột</label>
+                                    <select class="form-control input-square p-0" id="txt_new_col">
+
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="btn_submit">Xác nhận</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal repair-->
+            <div class="modal" id="modal_machine_list" tabindex="-1" role="dialog">
+                <style>
+                    .modal-lg {
+                        max-width: 80%;
+                    }
+                </style>
+                <div class="modal-dialog modal-lg " role="document" style="width: fit-content;">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h2 class="modal-title">Danh sách và thông tin máy nhà máy cắt</span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: red;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-3">
+                            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                <table class="table table-bordered table-hover" id="table_machine">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="text-center">#</th>
+                                            <th scope="col" class="text-center">Mã máy</th>
+                                            <th scope="col" class="text-center">Loại máy</th>
+                                            <th scope="col" class="text-center">Tên máy</th>
+                                            <th scope="col" class="text-center">Số Serial</th>
+                                            <th scope="col" class="text-center">Vị trí</th>
+                                            <th scope="col" class="text-center">Hàng</th>
+                                            <th scope="col" class="text-center">Cột</th>
+                                            <th scope="col" class="text-center">Trạng thái</th>
+                                            <th scope="col" class="text-center">Bảo hành</th>
+                                            <th scope="col" class="text-center">Ghi chú</th>
+                                            <th scope="col" class="text-center">Tài khoản</th>
+                                            <th scope="col" class="text-center">Thời gian cập nhật</th>
+                                            <th scope="col" class="text-center">Active</th>
+                                            <th scope="col" class="text-center">Chi tiết<br>Cập nhật</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- MachineInformation -->
+            <div class="modal" id="modal_machine_information" tabindex="-1" role="dialog">
+                <style>
+                    .modal-lg {
+                        max-width: 80%;
+                    }
+                </style>
+                <div class="modal-dialog modal-lg " role="document" style="width: fit-content;">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger">
+                            <h2 class="modal-title" id="txt_machine_information">Thông tin liên quan đến máy</span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: white;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body p-1">
+                            <div class="row row-demo-grid text-left">
+                                <div class="col-md-4">
+                                    <div class="form-group text-left" >
+										<label for="pop_MachineType">Chủng loại máy</label>
+										<input type="text" class="form-control" id="pop_MachineType">
+									</div>
+                                    <div class="form-group text-left">
+										<label for="pop_MachineName">Tên máy</label>
+										<input type="text" class="form-control" id="pop_MachineName">
+									</div>
+                                    <div class="form-group text-left">
+										<label for="pop_SerialNo">Số Serial</label>
+										<input type="text" class="form-control" id="pop_SerialNo">
+									</div>
+                                    <div class="form-group text-left">
+										<label for="pop_StatusMachine">Trạng thái máy</label>
+										<select class="form-control p-0" id="pop_StatusMachine">
+											<option>Good</option>
+											<option>Follow Up</option>
+											<option>Fail</option>
+										</select>
+									</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group text-left">
+										<label for="pop_MachineLocation">Vị trí máy</label>
+										<select class="form-control p-0" id="pop_MachineLocation">
+											<option>Floor</option>
+											<option>Stock</option>
+											<option>Other</option>
+										</select>
+									</div>
+                                    <div class="form-group text-left">
+										<label for="pop_IndexRow">Hàng số</label>
+										<input type="text" class="form-control" id="pop_IndexRow">
+									</div>
+                                    <div class="form-group text-left">
+										<label for="pop_IndexCol">Cột số</label>
+										<input type="text" class="form-control" id="pop_IndexCol">
+									</div>
+                                    <div class="form-group text-left">
+										<label for="pop_Active">Hiện thị xưởng</label>
+										<select class="form-control p-0" id="pop_Active">
+											<option>Y</option>
+											<option>N</option>
+										</select>
+									</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group text-left">
+										<label for="pop_MachineContract">Hết bảo hành</label>
+										<select class="form-control p-0" id="pop_MachineContract">
+											<option>Y</option>
+											<option>N</option>
+										</select>
+									</div>
+                                    <div class="form-group text-left">
+										<label for="pop_EntryDate">Ngày vào cty</label>
+										<input type="text" class="form-control" id="pop_EntryDate">
+									</div>
+                                    <div class="form-group text-left">
+										<label for="pop_LifeCycle">Thời gian bảo trì</label>
+										<input type="text" class="form-control" id="pop_LifeCycle">
+									</div>
+									<div class="form-group text-left">
+										<label for="pop_Comment">Ghi chú</label>
+										<textarea class="form-control" id="pop_Comment" rows="2">
+										</textarea>
+									</div>
+                                </div>
+                            </div>
+                            <div class="card-action" style="float: right;">
+                                <button class="btn btn-success" id="btn_update_machineinformation">Cập nhật thêm thông tin</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <!--   Core JS Files   -->
+    <script src="./assets/js/core/jquery.3.2.1.min.js"></script>
+    <script src="./assets/js/core/popper.min.js"></script>
+    <script src="./assets/js/core/bootstrap.min.js"></script>
+    <!-- jQuery UI -->
+    <script src="./assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+    <script src="./assets/js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"></script>
+    <!-- jQuery Scrollbar -->
+    <script src="./assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+    <!-- Moment JS -->
+    <script src="./assets/js/plugin/moment/moment.min.js"></script>
+    <!-- Chart JS -->
+    <script src="./assets/js/plugin/chart.js/chart.min.js"></script>
+    <!-- jQuery Sparkline -->
+    <script src="./assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+    <!-- Chart Circle -->
+    <script src="./assets/js/plugin/chart-circle/circles.min.js"></script>
+    <!-- Datatables -->
+    <script src="./assets/js/plugin/datatables/datatables.min.js"></script>
+    <!-- Bootstrap Notify -->
+    <script src="./assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <!-- Bootstrap Toggle -->
+    <script src="./assets/js/plugin/bootstrap-toggle/bootstrap-toggle.min.js"></script>
+    <!-- jQuery Vector Maps -->
+    <script src="./assets/js/plugin/jqvmap/jquery.vmap.min.js"></script>
+    <script src="./assets/js/plugin/jqvmap/maps/jquery.vmap.world.js"></script>
+    <!-- Google Maps Plugin -->
+    <script src="./assets/js/plugin/gmaps/gmaps.js"></script>
+    <!-- Sweet Alert -->
+    <script src="./assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+    <!-- Azzara JS -->
+    <script src="./assets/js/ready.min.js"></script>
+    <script src="./assets/js/setting-demo.js"></script>
+    <script src="./JS/MechanicCutting/js-mechanic-cutting-layout.js"></script>
+    <!-- TranMung -->
+</body>
+
+</html>

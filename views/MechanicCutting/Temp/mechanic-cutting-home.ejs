@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en" class="sidebar_minimize">
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Cutting Mechanic</title>
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <link rel="icon" href="./assets/img/icon.ico" type="image/x-icon" />
+    <script src="./assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+            google: { "families": ["Open+Sans:300,400,600,700"] },
+            custom: { "families": ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands"], urls: ['./assets/css/fonts.css'] },
+            active: function () {
+                sessionStorage.fonts = true;
+            }
+        });
+    </script>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/css/azzara.min.css">
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="./assets/css/demo.css">
+    <style>
+        .machine-container {
+            display: grid;
+            grid-template-columns: repeat(26, 1fr);
+            grid-template-rows: repeat(9, minmax(80px, 1fr));
+            /* Điều chỉnh chiều cao của mỗi dòng */
+            grid-gap: 5px;
+            border: 1px white;
+            width: 100%;
+            height: 100%;
+            /* Thêm chiều cao 100% */
+            padding-top: 30px;
+            padding-left: 30px;
+            padding-right: 30px;
+            padding-bottom: 30px;
+            max-width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .machine {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 12px;
+            position: relative;
+            border: 1px white;
+            grid-column: span 1;
+            text-align: center;
+            border-radius: 5px;
+            height: minmax(80px, 1fr);
+            /* Điều chỉnh chiều cao của máy */
+        }
+
+        .empty-cell {
+            background-color: rgb(243, 243, 243);
+            border: 1px dashed rgba(0, 0, 0, 0.5);
+            opacity: 0.4;
+            grid-column: span 1;
+            height: minmax(80px, 1fr);
+            /* Điều chỉnh chiều cao của máy */
+        }
+
+        .column-number {
+            position: absolute;
+            top: 0px;
+            left: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: calc(100% - 30px - 30px);
+            height: 30px;
+            font-weight: bold;
+        }
+
+        .column-number div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+
+
+        .row-number {
+            position: absolute;
+            top: 5px;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 30px;
+            height: 100%;
+            font-weight: bold;
+            height: minmax(80px, 1fr);
+            /* Điều chỉnh chiều cao của máy */
+        }
+
+        .row-number div {
+            height: calc(100% / 9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .column-background {
+            position: relative;
+            background-color: white;
+            border: 1px solid black;
+        }
+
+        .machine[state="0"] {
+            background-color: green;
+            /* Màu xanh */
+        }
+
+        .machine[state="2"] {
+            background-color: yellow;
+            /* Màu vàng */
+        }
+
+        .machine[state="1"] {
+            background-color: red;
+            /* Màu đỏ */
+        }
+
+        .machine[state="3"] {
+            background-color: blue;
+            /* Màu xanh dương */
+        }
+
+        #body {
+            font-size: 10px !important;
+        }
+    </style>
+</head>
+
+<body style="background-color: white;">
+    <div class="wrapper">
+        <div class="main-header" data-background-color="purple">
+            <!-- Logo Header -->
+            <div class="logo-header">
+
+                <a href="/" class="logo">
+                    <h2 class="navbar-brand" style="color: white;">Cutting Mechanic</h2>
+                </a>
+                <button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse"
+                    data-target="collapse" aria-expanded="true" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon">
+                        <i class="fa fa-bars"></i>
+                    </span>
+                </button>
+                <button class="topbar-toggler more"><i class="fa fa-ellipsis-v"></i></button>
+                <div class="navbar-minimize">
+                    <button class="btn btn-minimize btn-rounded">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- End Logo Header -->
+
+            <!-- Navbar Header -->
+            <nav class="navbar navbar-header navbar-expand-lg">
+                <span class="navbar-brand text-white">
+                    <img src="./assets/img/icons8-innovate-64.png" width="30" height="30" alt="">
+                    Giám sát trực quan & Bấm giờ máy hỏng
+                </span>
+                <div class="container-fluid">
+                    <button class="btn text-white" style="background-color: green;">Hoạt động tốt</button>
+
+                    <button class="btn text-white" style="background-color: red;">Đang hỏng</button>
+
+                    <button class="btn" style="background-color: yellow;">Đang sửa</button>
+
+                    <button class="btn text-white" style="background-color: blue;">PM</button>
+
+
+                </div>
+                <div class="container-fluid">
+                    <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
+                        <li class="nav-item dropdown hidden-caret">
+                            <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#"
+                                aria-expanded="false">
+                                <div class="avatar-sm">
+                                    <img src="./assets/img/inno.jpg" alt="..." class="avatar-img rounded-circle">
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user animated fadeIn">
+                                <li>
+                                    <div class="user-box">
+                                        <div class="avatar-lg"><img src="./assets/img/inno.jpg" alt="image profile"
+                                                class="avatar-img rounded"></div>
+                                        <div class="u-text">
+                                            <% if (typeof user!=='undefined' ) { %>
+                                                <h4 id="username">Xin chào <%= user%>
+                                                </h4>
+                                                <% } else { %>
+                                                    <h4 id="username">mung.tran@hanes.com</h4>
+                                                    <% } %>
+                                                        <p class="text-muted text-success">Leading the challange</p><a
+                                                            href="/logout"
+                                                            class="btn btn-rounded btn-danger btn-sm">Thoát</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                </div>
+            </nav>
+            <!-- End Navbar -->
+        </div>
+        <!-- Sidebar -->
+        <%- include ("./partials/mechanic-cutting-sidebar.ejs"); -%>
+            <!-- End Sidebar -->
+            <style>
+                .bg {
+                    background-color: white;
+                }
+            </style>
+            <div class="main-panel bg">
+                <!-- <div class="content bg">
+                    <div class="row justify-content-center p-2">
+                        <div class="text-center d-flex align-items-center">
+                            <h2 class="text-info"><i class="fas fa-magic" style="margin-right: 5px;"></i>Tổng số máy
+                                |<span id="txt_total_machine" class="text-success">40</span>
+                            </h2>
+                        </div>
+                        <div class="text-center d-flex align-items-center" style="margin-left: 60px;">
+                            <h2 class="text-info"><i class="fas fa-lemon" style="margin-right: 5px;"></i>Máy đang hỏng
+                                |<span id="txt_broken_machine" class="text-danger">4</span></h2>
+                        </div>
+                        <div class="text-center d-flex align-items-center" style="margin-left: 60px;">
+                            <h2 class="text-info"><i class="fas fa-registered" style="margin-right: 5px;"></i>Máy đang
+                                sửa |<span id="txt_repair_machine" class="text-warning">1</span></h2>
+                        </div>
+                        <div class="text-center d-flex align-items-center" style="margin-left: 60px;">
+                            <h2 class="text-info"><i class="fas fa-bug" style="margin-right: 5px;"></i>Máy đang
+                                PM |<span id="txt_pm_machine" class="text-muted">0</span></h2>
+                        </div>
+                        <button class="btn btn-success" style="margin-left: 40px;" id="btn_reload_downtime">
+                            <span class="btn-label">
+                                <i class="fas fa-atom"></i>
+                            </span>
+                            Làm mới
+                        </button>
+                    </div>
+                    <div class="row row-demo-grid">
+                        <div class="col-md-12" style="background-color: white;">
+                            <div class="card">
+                                <div class="card-body p-0">
+                                    <div class="container-fluid" style="padding:0px">
+                                        <div class="machine-container" id="machineContainer" style="overflow: scroll">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+            <!-- Modal open ticket -->
+            <div class="modal" id="modal_employee_open_ticket" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document" style="width: fit-content;">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary">
+                            <h2 class="modal-title">Mở yêu cầu sửa máy - <span id="txt_machine_name"></span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: red;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group col-md-12">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text text-danger">
+                                        <i class="fas fa-user-tag"></i>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Nhập IDNV" id="txt_idnv">
+                                <button type="button" class="btn btn-icon btn-round btn-primary" id='btn_clear'
+                                    style="margin-left: 5px;">
+                                    <i class="fas fa-recycle"></i>
+                                </button>
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group form-inline">
+                                    <i class="la fas fafas fa-fingerprint text-warning"
+                                        style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 14px;" id="txt_emp">Mã số:</span>
+                                </div>
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group form-inline">
+                                    <i class="la fas fa-address-book text-warning"
+                                        style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 14px;" id="txt_emp_name">Tên nhân viên:</span>
+                                </div>
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group form-inline">
+                                    <i class="la 
+                                    fas fa-parachute-box text-warning" style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 14px;" id="txt_machine">Thông tin máy:</span>
+                                </div>
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group col-md-12">
+                                    <label for="txt_code_err_machine" class="text-info" style="font-size: 14px;">Chọn
+                                        mã lỗi máy hỏng</label>
+                                    <select class="form-control input-square p-0" id="txt_code_err_machine">
+                                        <option value="" selected></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="btn_open_ticket">Đăng ký</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal repair-->
+            <div class="modal" id="modal_employee_repair_ticket" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document" style="width: fit-content;">
+                    <div class="modal-content">
+                        <div class="modal-header bg-secondary">
+                            <h2 class="modal-title">Thợ máy xác nhận - <span id="txt_machine_repair_name"></span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: red;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="col-md-4 form-group form-inline">
+                                    <i class="la fas fafas fa-fingerprint text-info"
+                                        style="margin-right: 5px;font-size: 14px;"></i>
+                                    <span style="font-size: 14px;" id="txt_repair_emp"></span>
+                                </div>
+                                <div class="col-md-8 form-group form-inline">
+                                    <i class="la fas fa-address-book text-info"
+                                        style="margin-right: 5px;font-size: 14px;"></i>
+                                    <span style="font-size: 14px;" id="txt_repair_emp_name"></span>
+                                </div>
+                            </div>
+
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group form-inline">
+                                    <i class="la 
+                                    fas fa-parachute-box text-info" style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 14px;color: red;" id="txt_broken_mechanic">Lỗi nhân viên
+                                        báo:</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="input-group col-md-12">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text text-info">
+                                        <i class="fas fa-user-tag"></i>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Scan ID thợ máy"
+                                    id="txt_idmechanic">
+                                <button type="button" class="btn btn-icon btn-round btn-primary"
+                                    id='btn_clear_idmechanic' style="margin-left: 5px;">
+                                    <i class="fas fa-recycle"></i>
+                                </button>
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group form-inline">
+                                    <i class="la fas fa-user-astronaut text-warning"
+                                        style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 14px;" id="txt_repair_mechanic_name">Thợ máy:</span>
+                                </div>
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group col-md-12">
+                                    <label for="txt_code_err_machine_mechanic" class="text-info"
+                                        style="font-size: 14px;">Chọn
+                                        mã lỗi máy hỏng xác nhận từ thợ máy</label>
+                                    <select class="form-control input-square p-0" id="txt_code_err_machine_mechanic">
+                                        <option value="" selected></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger float-left" id="btn_no_repair_ticket">
+                                <span class="btn-label"><i class="fa flaticon-interface-5"></i></span>Đóng không
+                                sửa</button>
+                            <button class="btn btn-success float-right" id="btn_repair_ticket"
+                                style="margin-left: 60px;">
+                                <span class="btn-label">
+                                    <i class="fa fa-check"></i>
+                                </span>Bắt đầu sửa</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal close ticket-->
+            <div class="modal" id="modal_employee_close_ticket" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document" style="width: fit-content;">
+                    <div class="modal-content">
+                        <div class="modal-header bg-danger">
+                            <h2 class="modal-title">Đóng yêu cầu máy hỏng- <span id="txt_machine_close"></span></h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: white;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="col-md-4 form-group form-inline">
+                                    <i class="la fas fafas fa-fingerprint text-dark"
+                                        style="margin-right: 5px;font-size: 14px;"></i>
+                                    <span style="font-size: 14px;" id="txt_close_emp"></span>
+                                </div>
+                                <div class="col-md-8 form-group form-inline">
+                                    <i class="la fas fa-address-book text-dark"
+                                        style="margin-right: 5px;font-size: 14px;"></i>
+                                    <span style="font-size: 14px;" id="txt_close_emp_name"></span>
+                                </div>
+                            </div>
+
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group form-inline">
+                                    <i class="la 
+                                    fas fa-parachute-box text-dark" style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 14px;color: red;" id="txt_broken">Lỗi :</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="input-group col-md-12">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text text-dark">
+                                        <i class="fas fa-user-tag"></i>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Scan ID sản xuất xác nhận"
+                                    id="txt_operator">
+                                <button type="button" class="btn btn-icon btn-round btn-primary" id='btn_clear_operator'
+                                    style="margin-left: 5px;">
+                                    <i class="fas fa-recycle"></i>
+                                </button>
+                            </div>
+                            <div class="input-group col-md-12" style="margin-top: 10px;">
+                                <div class="form-group form-inline">
+                                    <i class="la fas fa-user-astronaut text-warning"
+                                        style="margin-right: 5px;font-size: 20px;"></i>
+                                    <span style="font-size: 14px;" id="txt_operator_name">Sản xuất:</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+
+                            <button class="btn btn-secondary float-left" id="btn_request_part">
+                                <span class="btn-label"><i class="fas fa-dolly"></i>Yêu cầu
+                                    part</span></button>
+
+                            <button class="btn btn-success float-right" id="btn_close_ticket"
+                                style="margin-left: 60px;">
+                                <span class="btn-label">
+                                    <i class="fas fa-chevron-circle-down"></i>
+                                </span>Hoàn thành</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Request_Part-->
+            <div class="modal" id="modal_machine_part_request" tabindex="-1" role="dialog">
+                <style>
+                    .modal-lg {
+                        max-width: 80%;
+                    }
+                </style>
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header bg-secondary">
+                            <h2 class="modal-title">Yêu cấu phụ tùng sửa máy
+                                <span> </span>
+                                <span id="txt_macine_part_request"></span>
+                                <span>|</span>
+                                <span id="txt_macine_part_broken"></span>
+                            </h2>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                                style="color: red;">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row justify-content-center p-3">
+                                <div class="card col-sm-12">
+                                    <div class="card-body p-0">
+                                        <ul class="nav nav-pills nav-secondary d-flex justify-content-center"
+                                            id="pills-tab" role="tablist">
+                                            <li class="nav-item">
+                                                <a class="nav-link active" id="pills-home-tab" data-toggle="pill"
+                                                    href="#pills-home" role="tab" aria-controls="pills-home"
+                                                    aria-selected="true"><i class="fas fas fa-magic"
+                                                        style="margin-right: 2px;"></i>Chọn phụ tùng thiết bị yêu
+                                                    cầu</a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="pills-profile-tab" data-toggle="pill"
+                                                    href="#pills-profile" role="tab" aria-controls="pills-profile"
+                                                    aria-selected="false"><i class="fas fas fa-atom"
+                                                        style="margin-right: 2px;"></i>Tổng hợp danh sách</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content mt-2 mb-3" id="pills-tabContent">
+                                            <div class="tab-pane fade show active" id="pills-home" role="tabpanel"
+                                                aria-labelledby="pills-home-tab" style="width: 100%;">
+                                                <div class="form-group has-success">
+                                                    <label for="searchInput">Nhập từ khóa tìm kiếm</label>
+                                                    <input type="text" id="searchInput" value="" class="form-control">
+                                                </div>
+                                                <div class="table-responsive" style="height: 400px; overflow-y: auto ;">
+                                                    <table id="table_partlist"
+                                                        class="table table table-sm table-border table-hover"
+                                                        style="margin-left: 5px;margin-right: 5px;">
+                                                        <style>
+                                                            .custom-control-input {
+                                                                width: 40px;
+                                                                height: 40px;
+                                                            }
+                                                        </style>
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Chủng loại máy</th>
+                                                                <th>Mã phụ tùng</th>
+                                                                <th>Tên phụ tùng</th>
+                                                                <th>Chi tiết tiếng việt</th>
+                                                                <th>Tồn kho</th>
+                                                                <th>Chọn</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" id="pills-profile" role="tabpanel"
+                                                aria-labelledby="pills-profile-tab">
+                                                <div class="table-responsive" style="height: 600px; overflow-y: auto ;">
+                                                    <div class="d-flex" style="margin-bottom: 10px;">
+                                                        <button class="btn btn-success" id="btn_send_request"
+                                                            style="margin-left: auto;">Gửi
+                                                            yêu cầu</button>
+                                                    </div>
+                                                    <table id="table_partlist_request"
+                                                        class="table table table-sm table-border"
+                                                        style="margin-left: 5px;margin-right: 5px;">
+                                                        <thead class="bg-secondary">
+                                                            <tr>
+                                                                <th class="text-white">Mã phụ tùng</th>
+                                                                <th class="text-white">Tên phụ tùng</th>
+                                                                <th class="text-white">Chi tiết tiếng việt</th>
+                                                                <th class="text-white">Tồn kho<br>hiện tại</th>
+                                                                <th class="text-white">Số lượng <br> yêu cầu</th>
+                                                                <th class="text-white">Xoá yêu cầu</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <!--   Core JS Files   -->
+    <script src="./assets/js/core/jquery.3.2.1.min.js"></script>
+    <script src="./assets/js/core/popper.min.js"></script>
+    <script src="./assets/js/core/bootstrap.min.js"></script>
+    <!-- jQuery UI -->
+    <script src="./assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+    <script src="./assets/js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js"></script>
+    <!-- jQuery Scrollbar -->
+    <script src="./assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+    <!-- Moment JS -->
+    <script src="./assets/js/plugin/moment/moment.min.js"></script>
+    <!-- Chart JS -->
+    <script src="./assets/js/plugin/chart.js/chart.min.js"></script>
+    <!-- jQuery Sparkline -->
+    <script src="./assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+    <!-- Chart Circle -->
+    <script src="./assets/js/plugin/chart-circle/circles.min.js"></script>
+    <!-- Datatables -->
+    <script src="./assets/js/plugin/datatables/datatables.min.js"></script>
+    <!-- Bootstrap Notify -->
+    <script src="./assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+    <!-- Bootstrap Toggle -->
+    <script src="./assets/js/plugin/bootstrap-toggle/bootstrap-toggle.min.js"></script>
+    <!-- jQuery Vector Maps -->
+    <script src="./assets/js/plugin/jqvmap/jquery.vmap.min.js"></script>
+    <script src="./assets/js/plugin/jqvmap/maps/jquery.vmap.world.js"></script>
+    <!-- Google Maps Plugin -->
+    <script src="./assets/js/plugin/gmaps/gmaps.js"></script>
+    <!-- Sweet Alert -->
+    <script src="./assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+    <!-- Azzara JS -->
+    <script src="./assets/js/ready.min.js"></script>
+    <!-- Azzara DEMO methods, don't include it in your project! -->
+    <script src="./assets/js/setting-demo.js"></script>
+    <script src="./JS/MechanicCutting/js-mechanic-cutting-home.js"></script>
+    <!-- TranMung -->
+</body>
+
+</html>
